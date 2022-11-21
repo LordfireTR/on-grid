@@ -7,7 +7,7 @@ public class PathFinder
     Grid<PathNode> grid;
     List<PathNode> openList, closedList;
 
-    int MOVE_DIAGONAL_COST = 14;
+    int MOVE_DIAGONAL_COST = 140;
     int MOVE_STRAIGHT_COST = 10;
 
     public PathFinder(int width, int height, float cellSize, Vector3 originPosition)
@@ -19,6 +19,8 @@ public class PathFinder
             for (int z = 0; z < grid.GetHeight(); z++)
             {
                 grid.GetGridObject(x, z).SetNeighbourList();
+                grid.GetGridObject(x, z).isWalkable = true;
+                grid.GetGridObject(x, z).isOccupied = false;
             }
         }
     }
@@ -79,6 +81,11 @@ public class PathFinder
                 {
                     continue;
                 }
+                if (!neighbourNode.isWalkable && neighbourNode.isOccupied)
+                {
+                    closedList.Add(neighbourNode);
+                    continue;
+                }
 
                 int tentativeGCost = currentNode.gCost + CalculateDistanceCost(currentNode, neighbourNode);
 
@@ -115,7 +122,7 @@ public class PathFinder
         List<Vector3> vector3Path = new List<Vector3>();
         foreach (PathNode node in path)
         {
-            vector3Path.Add(grid.GetCellPosition(node.x, node.z));
+            vector3Path.Add(grid.GetCellPosition(node.x, node.z) + new Vector3(1, 0, 1) * grid.GetCellSize() * .5f);
         }
         return vector3Path;
     }

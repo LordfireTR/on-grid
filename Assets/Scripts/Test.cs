@@ -17,7 +17,7 @@ public class Test : MonoBehaviour
         currentZ = 0;
 
         ground.transform.localScale = new Vector3(gridWidth * cellSize, .1f, gridHeight * cellSize);
-        ground.transform.position = new Vector3(gridWidth * cellSize, 0, gridHeight * cellSize) * .5f;
+        ground.transform.position = new Vector3(gridWidth * cellSize, -.1f, gridHeight * cellSize) * .5f;
     }
 
     // Update is called once per frame
@@ -37,7 +37,7 @@ public class Test : MonoBehaviour
                 {
                     for (int i = 0; i < path.Count - 1; i++)
                     {
-                        Debug.DrawLine(new Vector3(path[i].x, 0, path[i].z) * 5f + Vector3.one * 2.5f, new Vector3(path[i+1].x, 0, path[i+1].z) * 5f + Vector3.one * 2.5f, Color.yellow, 100f);
+                        Debug.DrawLine(new Vector3(path[i].x, 0, path[i].z) * 5f + new Vector3(1, .4f, 1) * 2.5f, new Vector3(path[i+1].x, 0, path[i+1].z) * 5f + new Vector3(1, .4f, 1) * 2.5f, Color.yellow, 100f);
                     }
                     currentX = path[path.Count-1].x;
                     currentZ = path[path.Count-1].z;

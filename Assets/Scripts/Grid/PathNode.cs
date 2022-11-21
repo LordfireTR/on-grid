@@ -10,6 +10,7 @@ public class PathNode
     public int gCost, hCost, fCost;
     public PathNode cameFromNode;
     public List<PathNode> neighbourList;
+    public bool isWalkable, isOccupied;
 
     public PathNode(Grid<PathNode> grid, int x, int z)
     {

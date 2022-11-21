@@ -54,7 +54,7 @@ public class Grid<TGridObject>
         GameObject gameObject = new GameObject("World_Text", typeof(TextMesh));
         Transform transform = gameObject.transform;
         transform.localPosition = localPosition;
-        transform.eulerAngles = new Vector3(30, 45, 0);
+        transform.eulerAngles = new Vector3(60, 45, 0);
         TextMesh textMesh = gameObject.GetComponent<TextMesh>();
         textMesh.anchor = textAnchor;
         textMesh.text = text;
