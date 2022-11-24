@@ -7,34 +7,46 @@ public class UnitHandler : MonoBehaviour
     [SerializeField] GameObject grid;
     PathFinder pathFinder;
     Camera mainCam;
+    [SerializeField] LineRenderer pathLine;
 
     List<Vector3> path;
     float moveSpeed = .3f, planckLength;
-    int moveLimit = 2, actionLimit = 2;
-    bool isMoving;
+    int moveLimit = 5, actionLimit = 2;
+    bool isMoving, startMovement;
 
     void Awake()
     {
         mainCam = Camera.main;
+        planckLength = moveLimit * moveSpeed * Time.deltaTime;
     }
 
     void Start()
     {
         pathFinder = grid.GetComponent<GridHandler>().pathFinder;
-        planckLength = moveLimit * moveSpeed * Time.deltaTime;
         PlaceUnit();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetMouseButtonUp(0))
+        if (Input.GetMouseButton(0))
         {
             Ray ray = mainCam.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out RaycastHit raycastHit) && !isMoving && actionLimit > 0)
             {
+                startMovement = false;
                 pathFinder.GetGrid().GetXZ(raycastHit.point, out int x, out int z);
                 SetPath(raycastHit.point);
+                HighlightPath();
+            }
+        }
+        else if (Input.GetMouseButtonUp(0))
+        {
+            startMovement = true;
+            DisablePathLine();
+            if (!isMoving)
+            {
+                SpendAction();
             }
         }
         
@@ -50,26 +62,18 @@ public class UnitHandler : MonoBehaviour
         if (Mathf.Abs(xCurrent - xTarget) + Mathf.Abs(zCurrent - zTarget) <= moveLimit)
         {
             path = pathFinder.FindPath(transform.position, targetCellPosition);
-            isMoving = true;
-            actionLimit--;
         }
 
         if (path == null)
         {
             SetPath(transform.position);
         }
-
-        if (path.Count <= 1)
-        {
-            actionLimit++;
-        }
     }
 
     void HandleMovement()
     {
-        if (path != null && path.Count > 1)
+        if (path != null && path.Count > 1 && startMovement)
         {
-            pathFinder.GetGrid().GetGridObject(transform.position).isOccupied = false;
             Vector3 nextCellPosition = path[1];
             nextCellPosition.y = transform.position.y;
 
@@ -82,10 +86,12 @@ public class UnitHandler : MonoBehaviour
                 transform.position = nextCellPosition;
                 path.RemoveAt(0);
             }
+            isMoving = true;
         }
         else
         {
             isMoving = false;
+            startMovement = false;
             pathFinder.GetGrid().GetGridObject(transform.position).isOccupied = true;
         }
     }
@@ -99,5 +105,24 @@ public class UnitHandler : MonoBehaviour
             transform.position = properPosition;
             pathFinder.GetGrid().GetGridObject(x, z).isOccupied = true;
         }
+    }
+
+    void SpendAction()
+    {
+        actionLimit--;
+    }
+
+    void HighlightPath()
+    {
+        pathLine.positionCount = path.Count;
+        for (int i = 0; i < path.Count; i++)
+        {
+            pathLine.SetPosition(i, path[i] + Vector3.up*.5f);
+        }
+    }
+
+    void DisablePathLine()
+    {
+        pathLine.positionCount = 0;
     }
 }

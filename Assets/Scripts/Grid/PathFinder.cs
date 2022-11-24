@@ -21,6 +21,7 @@ public class PathFinder
                 grid.GetGridObject(x, z).SetNeighbourList();
                 grid.GetGridObject(x, z).isWalkable = true;
                 grid.GetGridObject(x, z).isOccupied = false;
+                grid.GetGridObject(x, z).isGoal = false;
             }
         }
     }
