@@ -7,15 +7,18 @@ public class UnitHandler : MonoBehaviour
     [SerializeField] GameObject grid;
     PathFinder pathFinder;
     Camera mainCam;
-    [SerializeField] LineRenderer pathLine;
+    [SerializeField] GameObject lineRenderer;
+    LineRenderer pathLine;
 
     List<Vector3> path;
     float moveSpeed = .3f, planckLength;
     int moveLimit = 5, actionLimit = 2;
-    bool isMoving, startMovement;
+    bool isMoving, startMovement, showPath;
 
     void Awake()
     {
+        pathLine = lineRenderer.GetComponent<LineRenderer>();
+        lineRenderer.SetActive(false);
         mainCam = Camera.main;
         planckLength = moveLimit * moveSpeed * Time.deltaTime;
     }
@@ -34,6 +37,7 @@ public class UnitHandler : MonoBehaviour
             Ray ray = mainCam.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out RaycastHit raycastHit) && !isMoving && actionLimit > 0)
             {
+                showPath = true;
                 startMovement = false;
                 pathFinder.GetGrid().GetXZ(raycastHit.point, out int x, out int z);
                 SetPath(raycastHit.point);
@@ -43,13 +47,19 @@ public class UnitHandler : MonoBehaviour
         else if (Input.GetMouseButtonUp(0))
         {
             startMovement = true;
-            DisablePathLine();
-            if (!isMoving)
+
+            //If path length > 1 spend action
+            if (path.Count > 1)
             {
                 SpendAction();
             }
         }
-        
+
+        if (!startMovement && !showPath)
+        {
+            DisablePathLine();
+        }
+
         HandleMovement();
     }
 
@@ -92,6 +102,7 @@ public class UnitHandler : MonoBehaviour
         {
             isMoving = false;
             startMovement = false;
+            showPath = false;
             pathFinder.GetGrid().GetGridObject(transform.position).isOccupied = true;
         }
     }
@@ -114,6 +125,7 @@ public class UnitHandler : MonoBehaviour
 
     void HighlightPath()
     {
+        lineRenderer.SetActive(true);
         pathLine.positionCount = path.Count;
         for (int i = 0; i < path.Count; i++)
         {
